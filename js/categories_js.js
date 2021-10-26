@@ -1,4 +1,4 @@
-function category_js() {
+$(document).ready( function(){
   $("<div class='display' style='float: left'> &nbsp>&nbsp </div>").prependTo(".category-list-item");
   $(".category-list-child").css("display","none");
 // .posts-expand .post-body ul li
@@ -20,5 +20,5 @@ function category_js() {
  
  
   })
-}
+})
  
