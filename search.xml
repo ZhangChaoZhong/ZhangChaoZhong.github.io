@@ -133,24 +133,73 @@
 <p><a href="https://github.com/CodecWang/opencv-python-tutorial">(2) opencv-python-tutorial</a></p>
 <p><a href="https://github.com/PyImageSearch/imutils">(3) imutils</a></p>
 <h4 id="4-6-图像-amp-文本特征提取"><a href="#4-6-图像-amp-文本特征提取" class="headerlink" title="4.6 图像&amp;文本特征提取"></a>4.6 图像&amp;文本特征提取</h4><p><a href="https://github.com/1044197988/Python-Image-feature-extraction">(1) Python-Image-feature-extraction</a></p>
-<h2 id="（五）导师沟通"><a href="#（五）导师沟通" class="headerlink" title="（五）导师沟通"></a>（五）导师沟通</h2><h4 id="5-1-礼貌"><a href="#5-1-礼貌" class="headerlink" title="5.1 礼貌"></a>5.1 礼貌</h4><blockquote>
+<h2 id="（五）相关建议"><a href="#（五）相关建议" class="headerlink" title="（五）相关建议"></a>（五）相关建议</h2><h3 id="5-1导师沟通"><a href="#5-1导师沟通" class="headerlink" title="5.1导师沟通"></a>5.1导师沟通</h3><h4 id="（1）礼貌"><a href="#（1）礼貌" class="headerlink" title="（1）礼貌"></a>（1）礼貌</h4><blockquote>
 <p>（1）打招呼，您</p>
 <p>（2）进办公室，记得敲门</p>
 </blockquote>
-<h4 id="5-2-及时反馈"><a href="#5-2-及时反馈" class="headerlink" title="5.2 及时反馈"></a>5.2 及时反馈</h4><blockquote>
+<h4 id="（2）及时反馈"><a href="#（2）及时反馈" class="headerlink" title="（2）及时反馈"></a>（2）及时反馈</h4><blockquote>
 <p>交待的事情，做完或没做完都得及时跟导师说下</p>
 </blockquote>
-<h4 id="5-3-想好再说"><a href="#5-3-想好再说" class="headerlink" title="5.3 想好再说"></a>5.3 想好再说</h4><blockquote>
+<h4 id="（3）想好再说"><a href="#（3）想好再说" class="headerlink" title="（3）想好再说"></a>（3）想好再说</h4><blockquote>
 <p>（1）发信息要逻辑清晰，不要让老师去猜…</p>
 <p>（2）有些事情无法在通过发信息说清，最好通过语音或者线下跟导师沟通</p>
 </blockquote>
-<h4 id="5-4-有事提前说"><a href="#5-4-有事提前说" class="headerlink" title="5.4 有事提前说"></a>5.4 有事提前说</h4><blockquote>
+<h4 id="（4）有事提前说"><a href="#（4）有事提前说" class="headerlink" title="（4）有事提前说"></a>（4）有事提前说</h4><blockquote>
 <p>（1）回家／组会请假：具体原因（不要含糊），具体时间，提前1-2天</p>
 </blockquote>
-<h4 id="5-5-不用什么事情都交代"><a href="#5-5-不用什么事情都交代" class="headerlink" title="5.5 不用什么事情都交代"></a>5.5 不用什么事情都交代</h4><blockquote>
+<h4 id="（5）不用什么事情都交代"><a href="#（5）不用什么事情都交代" class="headerlink" title="（5）不用什么事情都交代"></a>（5）不用什么事情都交代</h4><blockquote>
 <p>导师：不喜欢学生搞科研之外的事情（比如：蓝桥杯，华为杯等竞赛）</p>
 <p>（1）自己确实报名参加了，不用跟导师说，自己偷偷去就行，千万不要组会上跟他说</p>
 <p>（2）汇报内容最好是课程专业学习，论文，机器学习基础知识。</p>
+</blockquote>
+<h3 id="5-2-选课建议（专硕）"><a href="#5-2-选课建议（专硕）" class="headerlink" title="5.2 选课建议（专硕）"></a>5.2 选课建议（专硕）</h3><table>
+<thead>
+<tr>
+<th>自然辩证法概论</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>中国特色社会主义理论与实践研究</td>
+</tr>
+<tr>
+<td>英语</td>
+</tr>
+<tr>
+<td>专业英语</td>
+</tr>
+<tr>
+<td>数据结构</td>
+</tr>
+<tr>
+<td>统计学习</td>
+</tr>
+<tr>
+<td>运筹学</td>
+</tr>
+<tr>
+<td>高级操作系统或者计算机网络</td>
+</tr>
+<tr>
+<td>工程伦理</td>
+</tr>
+<tr>
+<td>软件系统实验</td>
+</tr>
+<tr>
+<td>工程伦理</td>
+</tr>
+<tr>
+<td>工程伦理</td>
+</tr>
+<tr>
+<td>专业实践</td>
+</tr>
+<tr>
+<td>劳动教育</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>组合数学，软件形式化方法（禁选）</p>
 </blockquote>
 <h2 id="（六）学术相关"><a href="#（六）学术相关" class="headerlink" title="（六）学术相关"></a>（六）学术相关</h2><h3 id="6-1-开题报告注意事项"><a href="#6-1-开题报告注意事项" class="headerlink" title="6.1 开题报告注意事项"></a>6.1 开题报告注意事项</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">1.技术路线图</span><br><span class="line">  1）要解释说明（详细点）</span><br><span class="line">  2）打印出来的图要清晰，最好不要加填充颜色（ppt可以）</span><br><span class="line">2.研究内容，采用什么方法解决什么问题</span><br><span class="line">3.关键技术，不能只是关键字</span><br><span class="line">4.参考文献</span><br><span class="line">	1）参考文献要有中英文献</span><br><span class="line">  2）引用要按顺序，或者时间顺序</span><br><span class="line">  3）参考文献时间近5年，不能太久远</span><br><span class="line">  4）有35多篇左右</span><br><span class="line">  5）文献按照GB/T 7714格式</span><br><span class="line">  5.英文字体要罗马字体</span><br><span class="line">6.打印的时候注意检查格式（行间距）</span><br><span class="line">7.选题类型跟老师商量</span><br><span class="line">8.标题，子标题，关键内容最好加粗（增强可读性）</span><br><span class="line">9.第一次出现的缩写英文，要用全称</span><br><span class="line">10.表达</span><br><span class="line">  1）不能口语化</span><br><span class="line">  2）简洁表达，不要啰嗦</span><br><span class="line">  3）不能使用我，我们等主观词语</span><br><span class="line">10.图要有编号</span><br></pre></td></tr></table></figure>
 
