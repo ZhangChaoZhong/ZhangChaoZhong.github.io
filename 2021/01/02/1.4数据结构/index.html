@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="google-site-verification" content="d4_pdYcNwIYae3EhA8wFzZvB6zxWe5KWfSnaliXR-Rc" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"zhangchaozhong.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="B+树和红黑树​        红黑树和一般的平衡二叉树，增、删、改、查的过程和效率、时间复杂度       ​       https:&#x2F;&#x2F;www.cnblogs.com&#x2F;ArleneZhangfj&#x2F;articles&#x2F;10067570.html       md5哈希函数 MD5信息摘要算法（英语：MD5 Message-Digest Algorithm），一种被广泛使用的密码散列函数，可以产生">
+<meta property="og:type" content="article">
+<meta property="og:title" content="1.4数据结构">
+<meta property="og:url" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/index.html">
+<meta property="og:site_name" content="生于九六年晚冬">
+<meta property="og:description" content="B+树和红黑树​        红黑树和一般的平衡二叉树，增、删、改、查的过程和效率、时间复杂度       ​       https:&#x2F;&#x2F;www.cnblogs.com&#x2F;ArleneZhangfj&#x2F;articles&#x2F;10067570.html       md5哈希函数 MD5信息摘要算法（英语：MD5 Message-Digest Algorithm），一种被广泛使用的密码散列函数，可以产生">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zhangchaozhong.github.io/Users/zcz/Desktop/images/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkwNzMzMg==,size_16,color_FFFFFF,t_70.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210824102803851.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210822164154093.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210822170936992.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210822164311788.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210822170716577.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210823104554997.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210823104833260.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210823104952157.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210823105034893.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210823111207204.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210823112731329.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210823113432516.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210823120702439.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210823141546174.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/Users/zcz/Desktop/images/image-20220505201110335.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/1629723882208.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/1629727411188.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/1629729017012.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/1629730789469.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/1629731753873.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/1629732316773.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210824101332233.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210824105721052.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210824111329071.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/1629780732111.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/1629783863502.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/1629784640672.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210904102456887.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210904102954921.png">
+<meta property="og:image" content="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210904103351047.png">
+<meta property="article:published_time" content="2021-01-02T14:10:00.000Z">
+<meta property="article:modified_time" content="2022-06-12T09:12:31.000Z">
+<meta property="article:author" content="ChaoZhong Zhang">
+<meta property="article:tag" content="Learning">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhangchaozhong.github.io/Users/zcz/Desktop/images/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkwNzMzMg==,size_16,color_FFFFFF,t_70.png">
+
+<link rel="canonical" href="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>1.4数据结构 | 生于九六年晚冬</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">生于九六年晚冬</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://zhangchaozhong.github.io/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/1.jpg">
+      <meta itemprop="name" content="ChaoZhong Zhang">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="生于九六年晚冬">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          1.4数据结构
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-01-02 22:10:00" itemprop="dateCreated datePublished" datetime="2021-01-02T22:10:00+08:00">2021-01-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-12 17:12:31" itemprop="dateModified" datetime="2022-06-12T17:12:31+08:00">2022-06-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF/" itemprop="url" rel="index"><span itemprop="name">学习路线</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h5 id="B-树和红黑树"><a href="#B-树和红黑树" class="headerlink" title="B+树和红黑树"></a>B+树和红黑树</h5><p>​        <a target="_blank" rel="noopener" href="https://www.nowcoder.com/jump/super-jump/word?word=%E7%BA%A2%E9%BB%91%E6%A0%91">红黑树</a>和一般的<a target="_blank" rel="noopener" href="https://www.nowcoder.com/jump/super-jump/word?word=%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91">平衡二叉树</a>，增、删、改、查的过程和效率、时间复杂度      </p>
+<p>​       <a target="_blank" rel="noopener" href="https://www.cnblogs.com/ArleneZhangfj/articles/10067570.html">https://www.cnblogs.com/ArleneZhangfj/articles/10067570.html</a>      </p>
+<p>md5哈希函数</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">MD5信息摘要算法（英语：MD5 Message-Digest Algorithm），一种被广泛使用的密码散列函数，可以产生出一个128位（16字节）的散列值（hash value），用于确保信息传输完整一致。</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">简述一下vector内存机制？（不够扩充两倍）</span><br><span class="line">map的实现？（红黑树）</span><br><span class="line">unondered_map的实现？（哈希）</span><br><span class="line">哈希碰撞了怎么办？</span><br><span class="line">（开放寻址法</span><br><span class="line">1.1. di=1,2,3，…，m-1，称线性探测再散列；</span><br><span class="line">1.2. di=1^2,-1^2,2^2,-2^2，⑶^2，…，±（k)^2,(k&lt;=m/2）称二次探测再散列；</span><br><span class="line">1.3. di=伪随机数序列，称伪随机探测再散列</span><br><span class="line">、再哈希、</span><br><span class="line">链式）</span><br></pre></td></tr></table></figure>
+
+<p>哈希表</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">它通过把关键码值映射到表中一个位置来访问记录，以加快查找的速度。</span><br><span class="line">这个映射函数叫做散列函数，存放记录的数组叫做散列表</span><br></pre></td></tr></table></figure>
+
+<p>哈希表和平衡二叉树的适用场合</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">哈希表：哈希表查找速度比较快，但是要耗比较多的内存。所以比较适用于对查找速度要求比较高、且内存空间足够的时候</span><br><span class="line">，数据元素之间无逻辑关系要求的情况。</span><br><span class="line">平衡二叉树：如果想在以后用二分法查找的时候查找速度比较快的话用建立平衡二叉树的方法（）</span><br></pre></td></tr></table></figure>
+
+<p>树中节点查找过程</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">（递进的方式简述每种树的概念和思想 二分查找 -&gt; 折半二叉树 -&gt; 平衡二叉树 -&gt; 红黑树 -&gt; B/B+树）</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">一致性哈希（环输出域）</span><br><span class="line">其中一个节点挂了怎么做（扔给下一个） </span><br><span class="line">如何实现负载均衡（每个机器无限多  id再hash）</span><br></pre></td></tr></table></figure>
+
+<p>哈希表大小设置多少合理 </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">（和vector一样吧，动态调整大小）</span><br><span class="line"></span><br><span class="line">如果不考虑rehash怎么做（应该是质数，因为避免冲突，另外大小设置和输入数据有关，具体应该是查表，表是科学家实践得出的参考值）</span><br></pre></td></tr></table></figure>
+
+<p>红黑树比平衡二叉树和好在哪儿</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">牺牲部分平衡性，换来时间复杂度的优化</span><br></pre></td></tr></table></figure>
+
+<p>空间时间互换</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">时间换空间的典型应用是查表，比如我要你求出100以内所有的质数并输出，你可能会动态求出这些质数，</span><br><span class="line">但是更快的是先求出这些质数并存到一个数组里面，然后直接输出这个数组即可。这就是空间换时间。</span><br></pre></td></tr></table></figure>
+
+<h3 id="线性表"><a href="#线性表" class="headerlink" title="线性表"></a>线性表</h3><h4 id="数组VS链表"><a href="#数组VS链表" class="headerlink" title="数组VS链表"></a>数组VS链表</h4><p>数组是一段连续的存储空间；链表不要求连续</p>
+<p>数组支持随机访问，而链表不支持。</p>
+<p>数组的大小固定，而链表则天然支持动态扩容。</p>
+<p>需要经常添加和删除数据的话，使用链表比较合适。</p>
+<h4 id="跳表"><a href="#跳表" class="headerlink" title="跳表"></a>跳表</h4><h4 id="十字链表"><a href="#十字链表" class="headerlink" title="十字链表"></a>十字链表</h4><h3 id="栈与队列"><a href="#栈与队列" class="headerlink" title="栈与队列"></a>栈与队列</h3><p><strong>栈和队列的区别</strong></p>
+<p>队列：先进先出<br>栈：先进后出 </p>
+<p>队列和栈的遍历数据速度<br>队列：基于地址指针进行遍历，而且可以从头部或者尾部进行遍历，但不能同时遍历，无需开辟空间，因为在遍历的过程中不影响数据结构，所以遍历速度要快<br>栈：只能从顶部取数据，也就是说最先进入栈底的，需要遍历整个栈才能取出来，遍历数据时需要微数据开辟临时空间，保持数据在遍历前的一致性</p>
+<p><strong>应用场景</strong></p>
+<p>逆序输出（将一个非负的十进制整数N转换成其他D进制数），括号匹配，迷宫求解，二叉树遍历，表达式求值</p>
+<p>回文判断：利用队列和栈的特性，一个是先进先出，一个是先进后出，迷宫问题，广度优先遍历</p>
+<h3 id="树与二叉树"><a href="#树与二叉树" class="headerlink" title="树与二叉树"></a>树与二叉树</h3><h5 id="1-树"><a href="#1-树" class="headerlink" title="1.树"></a>1.树</h5><p>树转二叉树</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">左孩子右兄弟</span><br><span class="line">//连接兄弟节点，砍掉非第一个左孩子，左旋45度</span><br></pre></td></tr></table></figure>
+
+<p>二叉树转树（二叉树有右孩子则转换为森林）</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">y是x的双亲 则将x的右孩子,x的右右孩子...与y连接，</span><br><span class="line">砍掉兄弟的连接，以及双亲y的右孩子</span><br></pre></td></tr></table></figure>
+
+<p>树 森林的遍历</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">森林的先序遍历和中序遍历分别对应该树转换成的二叉树的先序遍历和中序遍历  森林无后序遍历的定</span><br><span class="line">树的先序遍历和后序遍历分别对应该树转换成的二叉树的先序遍历和中序遍历    树没有中序遍历的定义。</span><br></pre></td></tr></table></figure>
+
+
+
+<h5 id="2-二叉树基本概念"><a href="#2-二叉树基本概念" class="headerlink" title="2.二叉树基本概念"></a>2.二叉树基本概念</h5><h5 id="3-二叉查找树"><a href="#3-二叉查找树" class="headerlink" title="3.二叉查找树"></a>3.二叉查找树</h5><h5 id="4-平衡二叉树"><a href="#4-平衡二叉树" class="headerlink" title="4.平衡二叉树"></a>4.平衡二叉树</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">左右子树都是平衡二叉树 且左右子树的深度差值的绝对值不大于1。</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h5 id="5-红黑树"><a href="#5-红黑树" class="headerlink" title="5.红黑树"></a>5.红黑树</h5><h3 id="图"><a href="#图" class="headerlink" title="图"></a>图</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">前序，中序，后序都可以看作是DFS，用栈实现，因为他们都是在找到叶子节点前一直遍历。 </span><br><span class="line">层序遍历属于BFS，用堆实现，因为它们是一层一层遍历。</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">https://www.nowcoder.com/discuss/346845?order=0&amp;page=1&amp;pos=6&amp;type=0</span><br><span class="line">面试常见智力题和概率题目及部分答案</span><br><span class="line"></span><br><span class="line">1.在一个公交车站等公交车，等一分钟等到车的概率为p，那么等三分钟等到车的概率是多少（p+(1-p)p+(1-p)(1-p)p，典型的二分概率）</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="哈希表"><a href="#哈希表" class="headerlink" title="哈希表"></a>哈希表</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">不论哈希表中数据有多少，增加，删除，改写数据的复杂度平均都是O(1)，效率非常高</span><br><span class="line">哈希表原理:根据关键码值(Key value)而直接进行访问的数据结构。</span><br><span class="line"></span><br><span class="line">解决哈希冲突</span><br><span class="line">1.开放定址法</span><br><span class="line">    线性探测再散列		缺点：集聚</span><br><span class="line">    二次探测再散列</span><br><span class="line">    伪随机探测再散列</span><br><span class="line"></span><br><span class="line">2.再哈希法</span><br><span class="line"></span><br><span class="line">3.链地址法</span><br><span class="line"></span><br><span class="line">https://www.cnblogs.com/hunternet/p/11324945.html</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">STL中hash_map扩容发生什么？</span><br><span class="line">(1) 创建一个新桶，该桶是原来桶两倍大最接近的质数(判断n是不是质数的方法：用n除2到sqrt(n)sqrt(n)范围内的数) ；</span><br><span class="line">(2) 将原来桶里的数通过指针的转换，插入到新桶中(注意STL这里做的很精细，没有直接将数据从旧桶遍历拷贝数据插入到新桶，而是通过指针转换)</span><br><span class="line">(3) 通过swap函数将新桶和旧桶交换，销毁新</span><br></pre></td></tr></table></figure>
+
+<h4 id="堆排序"><a href="#堆排序" class="headerlink" title="堆排序"></a>堆排序</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">https://www.cnblogs.com/tong-yuan/p/Heap.html</span><br><span class="line">https://blog.csdn.net/Answer2333333/article/details/100988379</span><br><span class="line">堆排序的原理、怎么建堆和排序。</span><br></pre></td></tr></table></figure>
+
+<h4 id="快排"><a href="#快排" class="headerlink" title="快排"></a>快排</h4><p>快速排序=冒泡+分治+递归</p>
+<ul>
+<li>先从数量中取出一个数作为基准数（简单起见可以取第一个数）</li>
+<li>分区过程，将比这个数大的数全放到他的右边，小于或者等于他的数放到左边（分区）</li>
+<li>再对左右区间重复第一步、第二步，直到各区间只有一个数.（递归）</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">（快排原理是二分法，已经排序好序列复杂度最高，partion函数使用随机定位）</span><br><span class="line">快排的最坏时间复杂度O（N2） 如何避免？（随机寻找pivot）如何随机</span><br><span class="line">（基础库的随机函数，如果rand() 是 (0, 1)区间，修改区间大小和偏移）</span><br></pre></td></tr></table></figure>
+
+<h4 id="桶排序"><a href="#桶排序" class="headerlink" title="桶排序"></a>桶排序</h4><ul>
+<li>设置一个定量的数组当作空桶； </li>
+<li>遍历输入数据，并且把数据一个一个放到对应的桶里去； </li>
+<li>对每个不是空的桶进行<a target="_blank" rel="noopener" href="https://www.nowcoder.com/jump/super-jump/word?word=%E6%8E%92%E5%BA%8F">排序</a>； </li>
+<li>从不是空的桶里把排好序的数据拼接起来。  </li>
+</ul>
+<h4 id="基数排序"><a href="#基数排序" class="headerlink" title="基数排序"></a>基数排序</h4><h4 id="计数排序"><a href="#计数排序" class="headerlink" title="计数排序"></a>计数排序</h4><h4 id="时间复杂度"><a href="#时间复杂度" class="headerlink" title="时间复杂度"></a>时间复杂度</h4><p><img src="/Users/zcz/Desktop/images/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkwNzMzMg==,size_16,color_FFFFFF,t_70.png" alt="在这里插入图片描述"></p>
+<table>
+<thead>
+<tr>
+<th>排序算法</th>
+<th>平均时间复杂度</th>
+<th>最差时间复杂度</th>
+<th>空间复杂度</th>
+<th>数据对象稳定性</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/huihut/interview/blob/master/Algorithm/BubbleSort.h">冒泡排序</a></td>
+<td>O(n2)</td>
+<td>O(n2)</td>
+<td>O(1)</td>
+<td>稳定</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/huihut/interview/blob/master/Algorithm/SelectionSort.h">选择排序</a></td>
+<td>O(n2)</td>
+<td>O(n2)</td>
+<td>O(1)</td>
+<td>数组不稳定、链表稳定</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/huihut/interview/blob/master/Algorithm/InsertSort.h">插入排序</a></td>
+<td>O(n2)</td>
+<td>O(n2)</td>
+<td>O(1)</td>
+<td>稳定</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/huihut/interview/blob/master/Algorithm/QuickSort.h">快速排序</a></td>
+<td>O(n*log2n)</td>
+<td>O(n2)和直接插入排序一样</td>
+<td>O(log2n)</td>
+<td>不稳定</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/huihut/interview/blob/master/Algorithm/HeapSort.cpp">堆排序</a></td>
+<td>O(n*log2n)</td>
+<td>O(n*log2n)</td>
+<td>O(1)</td>
+<td>不稳定</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/huihut/interview/blob/master/Algorithm/MergeSort.h">归并排序</a></td>
+<td>O(n*log2n)</td>
+<td>O(n*log2n)</td>
+<td><strong>O(n)</strong></td>
+<td>稳定</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/huihut/interview/blob/master/Algorithm/ShellSort.h">希尔排序</a></td>
+<td>O(n*log2n)</td>
+<td>O(n2)</td>
+<td>O(1)</td>
+<td>不稳定</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/huihut/interview/blob/master/Algorithm/CountSort.cpp">计数排序</a></td>
+<td>O(n+m)</td>
+<td>O(n+m)</td>
+<td>O(n+m)</td>
+<td>稳定</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/huihut/interview/blob/master/Algorithm/BucketSort.cpp">桶排序</a></td>
+<td>O(n)</td>
+<td>O(n)</td>
+<td>O(m)</td>
+<td>稳定</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/huihut/interview/blob/master/Algorithm/RadixSort.h">基数排序</a></td>
+<td>O(k*n)</td>
+<td>O(n2)</td>
+<td></td>
+<td>稳定</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>查找算法</th>
+<th>平均时间复杂度</th>
+<th>空间复杂度</th>
+<th>查找条件</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/huihut/interview/blob/master/Algorithm/SequentialSearch.h">顺序查找</a></td>
+<td>O(n)</td>
+<td>O(1)</td>
+<td>无序或有序</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/huihut/interview/blob/master/Algorithm/BinarySearch.h">二分查找（折半查找）</a></td>
+<td>O(log2n)</td>
+<td>O(1)</td>
+<td>有序</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/huihut/interview/blob/master/Algorithm/InsertionSearch.h">插值查找</a></td>
+<td>O(log2(log2n))</td>
+<td>O(1)</td>
+<td>有序</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/huihut/interview/blob/master/Algorithm/FibonacciSearch.cpp">斐波那契查找</a></td>
+<td>O(log2n)</td>
+<td>O(1)</td>
+<td>有序</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/huihut/interview/blob/master/DataStructure/HashTable.cpp">哈希查找</a></td>
+<td>O(1)</td>
+<td>O(n)</td>
+<td>无序或有序</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/huihut/interview/blob/master/Algorithm/BSTSearch.h">二叉查找树（二叉搜索树查找）</a></td>
+<td>O(log2n)</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/huihut/interview/blob/master/DataStructure/RedBlackTree.cpp">红黑树</a></td>
+<td>O(log2n)</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>2-3树</td>
+<td>O(log2n - log3n)</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>B树/B+树</td>
+<td>O(log2n)</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>图搜索算法</th>
+<th>数据结构</th>
+<th>遍历时间复杂度</th>
+<th>空间复杂度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%B9%BF%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2">BFS广度优先搜索</a></td>
+<td>邻接矩阵 邻接链表</td>
+<td>O(|v|2) O(|v|+|E|)</td>
+<td>O(|v|2) O(|v|+|E|)</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E6%B7%B1%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2">DFS深度优先搜索</a></td>
+<td>邻接矩阵 邻接链表</td>
+<td>O(|v|2) O(|v|+|E|)</td>
+<td>O(|v|2) O(|v|+|E|)</td>
+</tr>
+</tbody></table>
+<h4 id="其他算法"><a href="#其他算法" class="headerlink" title="其他算法"></a>其他算法</h4><table>
+<thead>
+<tr>
+<th>算法</th>
+<th>思想</th>
+<th>应用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%88%86%E6%B2%BB%E6%B3%95">分治法</a></td>
+<td>把一个复杂的问题分成两个或更多的相同或相似的子问题，直到最后子问题可以简单的直接求解，原问题的解即子问题的解的合并</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/huihut/interview/tree/master/Problems/RoundRobinProblem">循环赛日程安排问题</a>、排序算法（快速排序、归并排序）</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92">动态规划</a></td>
+<td>通过把原问题分解为相对简单的子问题的方式求解复杂问题的方法，适用于有重叠子问题和最优子结构性质的问题</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/huihut/interview/tree/master/Problems/KnapsackProblem">背包问题</a>、斐波那契数列</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E8%B4%AA%E5%BF%83%E6%B3%95">贪心法</a></td>
+<td>一种在每一步选择中都采取在当前状态下最好或最优（即最有利）的选择，从而希望导致结果是最好或最优的算法</td>
+<td>旅行推销员问题（最短路径问题）、最小生成树、哈夫曼编码</td>
+</tr>
+</tbody></table>
+<h2 id="1-排序算法"><a href="#1-排序算法" class="headerlink" title="1.排序算法"></a>1.排序算法</h2><p><img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210824102803851.png" alt="image-20210824102803851"></p>
+<p><img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210822164154093.png" alt="image-20210822164154093"></p>
+<p><strong>稳定性</strong>：</p>
+<p><img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210822170936992.png" alt="image-20210822170936992"></p>
+<h3 id="1-冒泡排序bubble-sort"><a href="#1-冒泡排序bubble-sort" class="headerlink" title="1.冒泡排序bubble sort"></a>1.冒泡排序bubble sort</h3><ol>
+<li>从头开始比较每一对相邻元素，如果第1个比第2个大，就交换它们的位置 ,(执行完一轮后，最末尾就是那个元素的最大的元素)</li>
+<li><strong>稳定</strong>的排序算法</li>
+</ol>
+<p>第一轮：<img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210822164311788.png" alt="image-20210822164311788"><img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210822170716577.png" alt="image-20210822170716577">复杂度（平均，最坏，O(n^2)，最好（O(n))  )</p>
+<p>优化：</p>
+<p>1.在内层循环用一个bool值记录是否进行交换，没有进行交换就直接中止（只有在有序才能优化，不然比普通的时间长，每一次多三个操作，定义，赋值，判断）</p>
+<p>2.忽略上一轮曾经找到的最大元素，重复执行步骤一，直到全部元素有序（比第一个优化方式更普遍）</p>
+<p>3前两种方式结合，交换则将尾巴赋值为1（最好的）</p>
+<h3 id="2-原地算法"><a href="#2-原地算法" class="headerlink" title="2.原地算法"></a>2.原地算法</h3><p>1.不依赖额外资源或者依赖少数额外资源，仅靠输出覆盖输入</p>
+<p>2.空间复杂度O(1)的都可以认为是原地算法</p>
+<p>冒泡排序属于In-place</p>
+<h3 id="3-选择排序"><a href="#3-选择排序" class="headerlink" title="3.选择排序"></a>3.选择排序</h3><ol>
+<li>从序列中找出最小的那个元素，然后与数组最开始元素交换位置（执行完一轮后，第一个开始的那个元素就是最大的元素）verse</li>
+<li>忽略1中曾经找到的最小元素，重复执行步骤1</li>
+<li><strong>不稳定</strong>的算法（1中小于等于也不能保证稳定，2,4, 2,5,1==&gt;1,4,2,5,2）</li>
+</ol>
+<p>第一轮：最小的元素在首位</p>
+<h3 id="4-堆排序-heap-sort-–对选择排序的优化"><a href="#4-堆排序-heap-sort-–对选择排序的优化" class="headerlink" title="4.堆排序 heap sort –对选择排序的优化"></a>4.堆排序 heap sort –对选择排序的优化</h3><p><img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210823104554997.png" alt="image-20210823104554997"><img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210823104833260.png" alt="image-20210823104833260"><img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210823104952157.png" alt="image-20210823104952157"><img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210823105034893.png" alt="image-20210823105034893"></p>
+<p>执行流程</p>
+<p>1.对序列进行原地建堆</p>
+<p>2.重复以下操作，直到堆的元素1(N-1次)</p>
+<p>交换堆顶元素和尾元素–&gt;堆的元素减1–&gt;对0的位置进行一次siftDown操作（logN)</p>
+<p>复杂度（NlogN) 空间复杂度（O(1))</p>
+<p>3.不稳定排序</p>
+<h3 id="5-插入排序-insertion-sort"><a href="#5-插入排序-insertion-sort" class="headerlink" title="5.插入排序 insertion sort"></a>5.插入排序 insertion sort</h3><p>类似于扑克牌排序</p>
+<p><img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210823111207204.png" alt="image-20210823111207204"></p>
+<p>执行流程</p>
+<p>1.在执行过程中，插入排序会将序列分为2部分</p>
+<p>头部是已经拍好序的，尾部是待排列的</p>
+<p>2.从头开始扫描每一个元素</p>
+<p>每当扫描到一个元素，就将它插入到头部合适的位置，使得头部的数据依然保持有序。</p>
+<p>逆序时复杂度（O(n**2))   最好的为O(n) 空间复杂O(1)</p>
+<p>3.<strong>稳定</strong>排序</p>
+<p><img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210823112731329.png" alt="image-20210823112731329"></p>
+<p>4.优化</p>
+<p>将<strong>交换</strong>转为<strong>挪动</strong>（交换为三步，挪动为一步）</p>
+<p>将待插元素备份–&gt;头部有序数据比待插元素大的，都朝尾部挪动一个位–&gt;将待插元素放到合适的位置</p>
+<p><img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210823113432516.png" alt="image-20210823113432516"></p>
+<h3 id="6-二分搜素–插入排序优化"><a href="#6-二分搜素–插入排序优化" class="headerlink" title="6.二分搜素–插入排序优化"></a>6.二分搜素–插入排序优化</h3><p>如何确定一个元素在数组中的位置</p>
+<p><img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210823120702439.png" alt="image-20210823120702439"></p>
+<p>复杂度（logn)</p>
+<p>1.如果存在多个重复的值，返回哪一个值不确定</p>
+<p>2.二分搜素优化了比较的次数</p>
+<p>3.要求二分搜素返回的插入位置：第一个大于v的元素位置（不能等于，保持稳定性）</p>
+<p><img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210823141546174.png" alt="image-20210823141546174"></p>
+<h3 id="7-归并排序-merge-sort"><a href="#7-归并排序-merge-sort" class="headerlink" title="7.归并排序 merge sort"></a>7.归并排序 merge sort</h3><p><img src="/Users/zcz/Desktop/images/image-20220505201110335.png" alt="image-20220505201110335"></p>
+<p>1.不断地将当前序列平均分割成2个子序列</p>
+<p>直到不能再分割（序列中只剩1个元素）</p>
+<p><img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/1629723882208.png" alt="1629723882208"></p>
+<p>2.不断地将2个子序列合并成一个有序序列</p>
+<p><img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/1629727411188.png" alt="1629727411188"></p>
+<p><img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/1629729017012.png" alt="1629729017012"></p>
+<p>如果ri提前越界，直接将li之后的所有元素覆盖过去；li提前结束，右边也不用动了</p>
+<p>复杂度（T(n)=T(n/2)*2+O(n)=O(nlogn) )最好，最坏，平均都是它</p>
+<p><img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/1629730789469.png" alt="1629730789469"></p>
+<p>空间复杂度O(n/2+logn)=O(n)</p>
+<h3 id="8-休眠排序–不提倡"><a href="#8-休眠排序–不提倡" class="headerlink" title="8.休眠排序–不提倡"></a>8.休眠排序–不提倡</h3><p>将要排序的数字设为休眠时间，每个数开一个线程，复杂度O(n)</p>
+<h3 id="9-快速排序-quick-sort"><a href="#9-快速排序-quick-sort" class="headerlink" title="9.快速排序 quick sort"></a>9.快速排序 quick sort</h3><p><img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/1629731753873.png" alt="1629731753873"></p>
+<p><img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/1629732316773.png" alt="1629732316773"></p>
+<p>复杂度：平均是$nlogn$<br><img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210824101332233.png" alt="image-20210824101332233"></p>
+<h3 id="10-希尔排序-Shell-Sort—插入排序的改进"><a href="#10-希尔排序-Shell-Sort—插入排序的改进" class="headerlink" title="10.希尔排序 Shell Sort—插入排序的改进"></a>10.希尔排序 Shell Sort—插入排序的改进</h3><p>1.把序列看做是一个矩阵，分成m列，逐列进行排序</p>
+<p>2.m从某个整数逐渐减为1</p>
+<p>3.当m为1时，整个序列完全有序</p>
+<p>希尔排序底层一般使用插入排序对每一列进行排序，也有很多资料认为希尔排序是插入排序的改进版</p>
+<h3 id="11-计数排序"><a href="#11-计数排序" class="headerlink" title="11.计数排序"></a>11.计数排序</h3><p>统计每个整数在序列中出现的次数，进而推导出每个整数在有序序列中的索引<br><img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210824105721052.png" alt="image-20210824105721052"></p>
+<p>1.找出最大值，给出相应存储空间</p>
+<p>2.统计次数存入数组</p>
+<p>3.依次取出大于1的索引</p>
+<p>以上方法问题：1.无法对负值计数 2.极其浪费空间 3.不稳定 4.只能对整数排序，不能对自定义对象排序</p>
+<p>改进：空间方面找出最大，最小值，从索引0开始存储次数，这样负值也能存进来，当前数值是max-min+1</p>
+<p><img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210824111329071.png" alt="image-20210824111329071"></p>
+<h3 id="12-基数排序"><a href="#12-基数排序" class="headerlink" title="12.基数排序"></a>12.基数排序</h3><p><img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/1629780732111.png" alt="1629780732111"></p>
+<p><img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/1629783863502.png" alt="1629783863502"></p>
+<h3 id="13-桶排序"><a href="#13-桶排序" class="headerlink" title="13.桶排序"></a>13.桶排序</h3><p><img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/1629784640672.png" alt="1629784640672"></p>
+<h2 id="2-关于B树-B-树-B-树以及红黑树的理解"><a href="#2-关于B树-B-树-B-树以及红黑树的理解" class="headerlink" title="2.关于B树 B+树 B*树以及红黑树的理解"></a>2.关于B树 B+树 B*树以及红黑树的理解</h2><h3 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h3><p>红黑树：linux中进程的调度用的是红黑树。数据较小，可以完全放到内存中时，红黑树的时间复杂度比B树低。</p>
+<p>B树：B树大量应用在数据库和文件系统当中</p>
+<p>B+树：mysql使用B+树作为索引</p>
+<p><strong>二叉树–&gt;二叉搜索树–&gt;二叉平衡树–&gt;红黑树</strong></p>
+<p>AVL:平衡二叉树</p>
+<h3 id="红黑树"><a href="#红黑树" class="headerlink" title="红黑树"></a><strong>红黑树</strong></h3><p>底层结构是：二叉树</p>
+<p><strong>定义</strong>：红黑树是基于二叉搜索树的，</p>
+<p>（1）其根节点和叶子节点为黑色，</p>
+<p>（2）每个红色节点的两个子节点一定是黑色，不能有两个红色节点相连，</p>
+<p>（3）任一节点到每个叶子节点的路径都包含数量相同的黑节点（黑高）</p>
+<p><strong>变颜色规则</strong>：所有插入的点默认为红色</p>
+<h4 id="插入："><a href="#插入：" class="headerlink" title="插入："></a><em><strong>插入：</strong></em></h4><p>1.当前父亲节点是黑色直接插入</p>
+<p>2.当前父亲节点是红色</p>
+<p>​    （1）叔叔是红色，父亲节点和叔叔节点变黑，爷爷变红，指正定位到爷爷节点</p>
+<p>​    （2）叔叔节点是黑色，</p>
+<p>​                A.LL直接将父节点变为黑色，爷爷节点变红，做一次右旋</p>
+<p>​                B.LR左旋成LL,再操作LL</p>
+<p>​            </p>
+<p><img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210904102456887.png" alt="image-20210904102456887" style="zoom:50%;">–<img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210904102954921.png" alt="image-20210904102954921" style="zoom:50%;">-&gt;<img src="/2021/01/02/1.4%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/image-20210904103351047.png" alt="image-20210904103351047" style="zoom:50%;"></p>
+<h3 id="B树-B-树"><a href="#B树-B-树" class="headerlink" title="B树(B-树)"></a>B<strong>树</strong>(B-树)</h3><p>B 树是为了磁盘或其它存储设备而设计的一种多叉平衡查找树。</p>
+<p>一棵M阶的B树：</p>
+<p>（1）每个节点最多有m棵子树</p>
+<p>（2）除根节点外，其余非叶子节点至少有ceil(M/2)棵子树，最多有M-1个关键码</p>
+<p>（3）所有叶子节点都在同一层</p>
+<p> <em>一棵含有N个总关键字数的m阶的B树的最大高度是多少?</em> log_ceil（m/2）{(N+1)/2} + 1 ，log以（m/2）为低，(N+1)/2的对数再加1</p>
+<h3 id="B-树"><a href="#B-树" class="headerlink" title="B+树"></a>B+树</h3><p>是应文件系统所需而产生的一种B-tree的变形树。</p>
+<p>   (1) 有m个子树的中间节点包含有m个元素（B树中是k-1个元素），每个元素不保存数据，只用来索引；</p>
+<p>（2）所有的叶子结点中包含了全部关键字的信息，及指向含有这些关键字记录的指针，且叶子结点本身依关键字的大小自小而大的顺序链接。</p>
+<p>（3）<strong>所有的非终端结点可以看成是索引部分</strong>，结点中仅含有其子树根结点中最大（或最小）关键字</p>
+<p><strong>为什么说B+树比B树更适合数据库索引？</strong></p>
+<p>1）B+树的磁盘读写代价更低</p>
+<p>　　B+树的内部结点并没有指向关键字具体信息的指针。因此其内部结点相对B 树更小。如果把所有同一内部结点的关键字存放在同一盘块中，那么盘块所能容纳的关键字数量也越多。一次性读入内存中的需要查找的关键字也就越多。相对来说IO读写次数也就降低了；</p>
+<p>2）B+树查询效率更加稳定</p>
+<p>　　由于非终结点并不是最终指向文件内容的结点，而只是叶子结点中关键字的索引。所以任何关键字的查找必须走一条从根结点到叶子结点的路。所有关键字查询的路径长度相同，导致每一个数据的查询效率相当；</p>
+<p>3）B+树便于范围查询（最重要的原因，范围查找是数据库的常态）</p>
+<p>　　B树在提高了IO性能的同时并没有解决元素遍历的效率低下的问题，正是为了解决这个问题，B+树应用而生。B+树只需要去遍历叶子节点就可以实现整棵树的遍历。而且在数据库中基于范围的查询是非常频繁的，而B树不支持这样的操作或者说效率太低；不懂可以看看这篇解读-》<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/54102723">范围查找</a></p>
+<h3 id="B-树-1"><a href="#B-树-1" class="headerlink" title="B*树"></a>B*树</h3><p>​    是B+树的变体，在B+树的非根和非叶子结点再增加指向兄弟的指针；</p>
+<p>  B*树定义了非叶子结点关键字个数至少为(2/3)*M，即块的最低使用率为2/3（代替B+树的1/2）；</p>
+<p>​    B+树的分裂：当一个结点满时，分配一个新的结点，并将原结点中1/2的数据复制到新结点，最后在父结点中增加新结点的指针；B+树的分裂只影响原结点和父结点，而不会影响兄弟结点，所以它不需要指向兄弟的指针；</p>
+<p>​    B*树的分裂：当一个结点满时，如果它的下一个兄弟结点未满，那么将一部分数据移到兄弟结点中，再在原结点插入关键字，最后修改父结点中兄弟结点的关键字（因为兄弟结点的关键字范围改变了）；如果兄弟也满了，则在原结点与兄弟结点之间增加新结点，并各复制1/3的数据到新结点，最后在父结点增加新结点的指针；</p>
+<p>​    所以，B*树分配新结点的概率比B+树要低，空间使用率更高；</p>
+<h2 id="3-给定a、b两个文件，各存放50亿个url，每个url各占64字节，内存限制是4G，让你找出a、b文件共同的url"><a href="#3-给定a、b两个文件，各存放50亿个url，每个url各占64字节，内存限制是4G，让你找出a、b文件共同的url" class="headerlink" title="3.给定a、b两个文件，各存放50亿个url，每个url各占64字节，内存限制是4G，让你找出a、b文件共同的url?"></a>3.给定a、b两个文件，各存放50亿个url，每个url各占64字节，内存限制是4G，让你找出a、b文件共同的url?</h2><p>假如每个url大小为10bytes，那么可以估计每个文件的大小为50G×64=320G，远远大于内存限制的4G，所以不可能将其完全加载到内存中处理，可以采用分治的思想来解决。</p>
+<p>　　Step1：遍历文件a，对每个url求取hash(url)%1000，然后根据所取得的值将url分别存储到1000个小文件(记为a0,a1,…,a999，每个小文件约300M);</p>
+<p>　　Step2:遍历文件b，采取和a相同的方式将url分别存储到1000个小文件(记为b0,b1,…,b999);</p>
+<p>　　巧妙之处：这样处理后，所有可能相同的url都被保存在对应的小文件(a0vsb0,a1vsb1,…,a999vsb999)中，不对应的小文件不可能有相同的url。然后我们只要求出这个1000对小文件中相同的url即可。</p>
+<p>　　Step3：求每对小文件ai和bi中相同的url时，可以把ai的url存储到hash_set/hash_map中。然后遍历bi的每个url，看其是否在刚才构建的hash_set中，如果是，那么就是共同的url，存到文件里面就可以了。</p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/24383239">https://zhuanlan.zhihu.com/p/24383239</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div>
+            
+              <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+            
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/02/1.2Java%E5%9F%BA%E7%A1%80/" rel="prev" title="1.2Java基础">
+      <i class="fa fa-chevron-left"></i> 1.2Java基础
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/02/1.3JVM/" rel="next" title="1.3JVM">
+      1.3JVM <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#B-%E6%A0%91%E5%92%8C%E7%BA%A2%E9%BB%91%E6%A0%91"><span class="nav-text">B+树和红黑树</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%BF%E6%80%A7%E8%A1%A8"><span class="nav-text">线性表</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%95%B0%E7%BB%84VS%E9%93%BE%E8%A1%A8"><span class="nav-text">数组VS链表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B7%B3%E8%A1%A8"><span class="nav-text">跳表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8D%81%E5%AD%97%E9%93%BE%E8%A1%A8"><span class="nav-text">十字链表</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%88%E4%B8%8E%E9%98%9F%E5%88%97"><span class="nav-text">栈与队列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%91%E4%B8%8E%E4%BA%8C%E5%8F%89%E6%A0%91"><span class="nav-text">树与二叉树</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-%E6%A0%91"><span class="nav-text">1.树</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-%E4%BA%8C%E5%8F%89%E6%A0%91%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-text">2.二叉树基本概念</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-%E4%BA%8C%E5%8F%89%E6%9F%A5%E6%89%BE%E6%A0%91"><span class="nav-text">3.二叉查找树</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91"><span class="nav-text">4.平衡二叉树</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#5-%E7%BA%A2%E9%BB%91%E6%A0%91"><span class="nav-text">5.红黑树</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE"><span class="nav-text">图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E8%A1%A8"><span class="nav-text">哈希表</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A0%86%E6%8E%92%E5%BA%8F"><span class="nav-text">堆排序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BF%AB%E6%8E%92"><span class="nav-text">快排</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A1%B6%E6%8E%92%E5%BA%8F"><span class="nav-text">桶排序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E6%95%B0%E6%8E%92%E5%BA%8F"><span class="nav-text">基数排序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F"><span class="nav-text">计数排序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="nav-text">时间复杂度</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95"><span class="nav-text">其他算法</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95"><span class="nav-text">1.排序算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8Fbubble-sort"><span class="nav-text">1.冒泡排序bubble sort</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%8E%9F%E5%9C%B0%E7%AE%97%E6%B3%95"><span class="nav-text">2.原地算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F"><span class="nav-text">3.选择排序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%A0%86%E6%8E%92%E5%BA%8F-heap-sort-%E2%80%93%E5%AF%B9%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F%E7%9A%84%E4%BC%98%E5%8C%96"><span class="nav-text">4.堆排序 heap sort –对选择排序的优化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F-insertion-sort"><span class="nav-text">5.插入排序 insertion sort</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E4%BA%8C%E5%88%86%E6%90%9C%E7%B4%A0%E2%80%93%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F%E4%BC%98%E5%8C%96"><span class="nav-text">6.二分搜素–插入排序优化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F-merge-sort"><span class="nav-text">7.归并排序 merge sort</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-%E4%BC%91%E7%9C%A0%E6%8E%92%E5%BA%8F%E2%80%93%E4%B8%8D%E6%8F%90%E5%80%A1"><span class="nav-text">8.休眠排序–不提倡</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F-quick-sort"><span class="nav-text">9.快速排序 quick sort</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-%E5%B8%8C%E5%B0%94%E6%8E%92%E5%BA%8F-Shell-Sort%E2%80%94%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F%E7%9A%84%E6%94%B9%E8%BF%9B"><span class="nav-text">10.希尔排序 Shell Sort—插入排序的改进</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#11-%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F"><span class="nav-text">11.计数排序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#12-%E5%9F%BA%E6%95%B0%E6%8E%92%E5%BA%8F"><span class="nav-text">12.基数排序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#13-%E6%A1%B6%E6%8E%92%E5%BA%8F"><span class="nav-text">13.桶排序</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%85%B3%E4%BA%8EB%E6%A0%91-B-%E6%A0%91-B-%E6%A0%91%E4%BB%A5%E5%8F%8A%E7%BA%A2%E9%BB%91%E6%A0%91%E7%9A%84%E7%90%86%E8%A7%A3"><span class="nav-text">2.关于B树 B+树 B*树以及红黑树的理解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-text">应用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%A2%E9%BB%91%E6%A0%91"><span class="nav-text">红黑树</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%EF%BC%9A"><span class="nav-text">插入：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#B%E6%A0%91-B-%E6%A0%91"><span class="nav-text">B树(B-树)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#B-%E6%A0%91"><span class="nav-text">B+树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#B-%E6%A0%91-1"><span class="nav-text">B*树</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E7%BB%99%E5%AE%9Aa%E3%80%81b%E4%B8%A4%E4%B8%AA%E6%96%87%E4%BB%B6%EF%BC%8C%E5%90%84%E5%AD%98%E6%94%BE50%E4%BA%BF%E4%B8%AAurl%EF%BC%8C%E6%AF%8F%E4%B8%AAurl%E5%90%84%E5%8D%A064%E5%AD%97%E8%8A%82%EF%BC%8C%E5%86%85%E5%AD%98%E9%99%90%E5%88%B6%E6%98%AF4G%EF%BC%8C%E8%AE%A9%E4%BD%A0%E6%89%BE%E5%87%BAa%E3%80%81b%E6%96%87%E4%BB%B6%E5%85%B1%E5%90%8C%E7%9A%84url"><span class="nav-text">3.给定a、b两个文件，各存放50亿个url，每个url各占64字节，内存限制是4G，让你找出a、b文件共同的url?</span></a></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="ChaoZhong Zhang"
+      src="/images/1.jpg">
+  <p class="site-author-name" itemprop="name">ChaoZhong Zhang</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/ZhangXiaoyu_sy" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;ZhangXiaoyu_sy" rel="noopener" target="_blank"><i class="fa fa-crosshairs fa-fw"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZhangChaoZhong" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZhangChaoZhong" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/zczindex@gmail.com" title="E-Mail → zczindex@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+      
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ChaoZhong Zhang
+  </span>
+  <span class="busuanzi-count">
+  <script async="" src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js";></script>
+
+  <span class="site-uv">
+  <i class="fa fa-user"> 本站访客数</i>
+  <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+  人
+  </span>
+
+  <span class="site-pv">
+  <i class="fa fa-eye"> 本站总访问量</i>
+  <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+  次
+  </span>
+
+</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'LitCJHzcYDrw3V694F5ykefU-9Nh9j0Va',
+      appKey     : 'xrhUoMdaVndszRNhqsBy6jni',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
